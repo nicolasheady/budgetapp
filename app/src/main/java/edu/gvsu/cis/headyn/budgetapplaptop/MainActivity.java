@@ -17,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import edu.gvsu.cis.headyn.budgetapplaptop.fragments.DailyFragment;
 import edu.gvsu.cis.headyn.budgetapplaptop.fragments.RecurringFragment;
 import edu.gvsu.cis.headyn.budgetapplaptop.fragments.SettingsFragment;
 
@@ -91,13 +92,9 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.daily) {
-
+            fragment = new DailyFragment();
         } else if (id == R.id.recurring) {
-            //Intent launchRecurring = new Intent (MainActivity.this, ItemListActivity.class);
-            //startActivity(launchRecurring);
-
             fragment = new RecurringFragment();
-
         } else if (id == R.id.settings) {
             fragment = new SettingsFragment();
         } else if (id == R.id.nav_share) {
@@ -129,6 +126,7 @@ public class MainActivity extends AppCompatActivity
 
     private void launchAddItem() {
         Intent launchAddItem = new Intent(this, AddItemActivity.class);
+        launchAddItem.putExtra("Previous Activity", "Fab");
         startActivity(launchAddItem);
     }
 }

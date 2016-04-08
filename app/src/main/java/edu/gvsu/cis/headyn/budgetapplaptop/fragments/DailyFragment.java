@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
+import edu.gvsu.cis.headyn.budgetapplaptop.AddItemActivity;
+import edu.gvsu.cis.headyn.budgetapplaptop.DailyTransactions;
 import edu.gvsu.cis.headyn.budgetapplaptop.ItemDetailActivity;
 import edu.gvsu.cis.headyn.budgetapplaptop.ItemDetailFragment;
 import edu.gvsu.cis.headyn.budgetapplaptop.R;
@@ -30,9 +32,9 @@ public class DailyFragment extends Fragment {
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View myView = inflater.inflate(R.layout.fragment_recurring, container, false);
+        View myView = inflater.inflate(R.layout.fragment_daily, container, false);
 
-        View recyclerView = myView.findViewById(R.id.recurring_item_list);
+        View recyclerView = myView.findViewById(R.id.daily_item_list);
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
 
@@ -47,15 +49,15 @@ public class DailyFragment extends Fragment {
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(RecurringTransactions.recurringItems));
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DailyTransactions.dailyItems));
     }
 
     public class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
-        private final List<RecurringTransactions.RecurringItem> mValues;
+        private final List<DailyTransactions.DailyItem> mValues;
 
-        public SimpleItemRecyclerViewAdapter(List<RecurringTransactions.RecurringItem> items) {
+        public SimpleItemRecyclerViewAdapter(List<DailyTransactions.DailyItem> items) {
             mValues = items;
         }
 
@@ -69,16 +71,19 @@ public class DailyFragment extends Fragment {
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.mItem = mValues.get(position);
-            holder.mIdView.setText(mValues.get(position).categoryName);
-            double total = mValues.get(position).totalAmount;
+            holder.mIdView.setText(mValues.get(position).name);
+            double total = mValues.get(position).amount;
             holder.mContentView.setText(String.format("%1$,.2f", total));
+
+            final String itemName = mValues.get(position).name;
+            final String itemAmount = String.format("%1$,.2f", total);
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mTwoPane) {
                         Bundle arguments = new Bundle();
-                        arguments.putString(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.categoryName);
+                        arguments.putString(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.name);
                         Fragment fragment = new Fragment();
                         fragment.setArguments(arguments);
                         getFragmentManager().beginTransaction()
@@ -86,8 +91,10 @@ public class DailyFragment extends Fragment {
                                 .commit();
                     } else {
                         Context context = v.getContext();
-                        Intent intent = new Intent(context, ItemDetailActivity.class);
-                        intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.categoryName);
+                        Intent intent = new Intent(context, AddItemActivity.class);
+                        intent.putExtra("Previous Activity", "DailyFragment");
+                        intent.putExtra("Name", itemName);
+                        intent.putExtra("Amount", itemAmount);
 
                         context.startActivity(intent);
                     }
@@ -104,7 +111,7 @@ public class DailyFragment extends Fragment {
             public final View mView;
             public final TextView mIdView;
             public final TextView mContentView;
-            public RecurringTransactions.RecurringItem mItem;
+            public DailyTransactions.DailyItem mItem;
 
             public ViewHolder(View view) {
                 super(view);

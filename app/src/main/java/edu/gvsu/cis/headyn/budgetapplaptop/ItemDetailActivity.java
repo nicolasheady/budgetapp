@@ -27,6 +27,7 @@ import java.util.List;
 public class ItemDetailActivity extends AppCompatActivity {
 
     private boolean mTwoPane;
+    private int listPosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,9 @@ public class ItemDetailActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        Intent previous = getIntent();
+        this.listPosition = previous.getIntExtra("List Position", 0);
 
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
@@ -77,6 +81,7 @@ public class ItemDetailActivity extends AppCompatActivity {
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
 
+        /*
         if (findViewById(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
@@ -84,8 +89,7 @@ public class ItemDetailActivity extends AppCompatActivity {
             // activity should be in two-pane mode.
             mTwoPane = true;
         }
-
-        //
+        */
     }
 
     @Override
@@ -105,15 +109,15 @@ public class ItemDetailActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(RecurringTransactions.ITEMS));
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(RecurringTransactions.recurringItems.get(this.listPosition).dailyItems));
     }
 
     public class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
-        private final List<RecurringTransactions.RecurringItem> mValues;
+        private final List<DailyTransactions.DailyItem> mValues;
 
-        public SimpleItemRecyclerViewAdapter(List<RecurringTransactions.RecurringItem> items) {
+        public SimpleItemRecyclerViewAdapter(List<DailyTransactions.DailyItem> items) {
             mValues = items;
         }
 
@@ -127,15 +131,19 @@ public class ItemDetailActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.mItem = mValues.get(position);
-            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
+            holder.mIdView.setText(mValues.get(position).name);
+            double total = mValues.get(position).amount;
+            holder.mContentView.setText(String.format("%1$,.2f", total));
+
+            final String itemName = mValues.get(position).name;
+            final String itemAmount = String.format("%1$,.2f", total);
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mTwoPane) {
                         Bundle arguments = new Bundle();
-                        arguments.putString(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+                        arguments.putString(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.name);
                         android.app.Fragment fragment = new android.app.Fragment();
                         fragment.setArguments(arguments);
                         getFragmentManager().beginTransaction()
@@ -143,8 +151,10 @@ public class ItemDetailActivity extends AppCompatActivity {
                                 .commit();
                     } else {
                         Context context = v.getContext();
-                        Intent intent = new Intent(context, ItemDetailActivity.class);
-                        intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+                        Intent intent = new Intent(context, AddItemActivity.class);
+                        intent.putExtra("Previous Activity", "RecurringTransFragment");
+                        intent.putExtra("Name", itemName);
+                        intent.putExtra("Amount", itemAmount);
 
                         context.startActivity(intent);
                     }
@@ -161,7 +171,7 @@ public class ItemDetailActivity extends AppCompatActivity {
             public final View mView;
             public final TextView mIdView;
             public final TextView mContentView;
-            public RecurringTransactions.RecurringItem mItem;
+            public DailyTransactions.DailyItem mItem;
 
             public ViewHolder(View view) {
                 super(view);

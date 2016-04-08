@@ -14,34 +14,31 @@ import java.util.Map;
 public class RecurringTransactions {
 
     /**
-     * An array of sample (dummy) items.
+     * An array of recurring transactions
      */
-    public static final List<RecurringItem> ITEMS = new ArrayList<RecurringItem>();
+    public static List<RecurringItem> recurringItems = new ArrayList<RecurringItem>();
 
     /**
-     * A map of sample (dummy) items, by ID.
+     * A map of recurring transactions, by ID.
      */
     public static final Map<String, RecurringItem> ITEM_MAP = new HashMap<String, RecurringItem>();
 
-    private static final int COUNT = 25;
-
-    private int numCategories;
-    private String categoryName;
+    private static final int COUNT = 5;
 
     static {
         // Add some sample items.
         for (int i = 1; i <= COUNT; i++) {
-            addItem(createDummyItem("Test transaction.", "Expenses", "Test details", 50.0));
+            addItem(createRecurringItem("Test recurring."));
         }
     }
 
     private static void addItem(RecurringItem item) {
-        ITEMS.add(item);
-        ITEM_MAP.put(item.id, item);
+        recurringItems.add(item);
+        ITEM_MAP.put(item.categoryName, item);
     }
 
-    public static RecurringItem createDummyItem(String id, String content, String details, double amount) {
-        return new RecurringItem(id, content, details, amount);
+    public static RecurringItem createRecurringItem(String name) {
+        return new RecurringItem(name);
     }
 
     private static String makeDetails(int position) {
@@ -57,23 +54,35 @@ public class RecurringTransactions {
      * A recurring transaction object.
      */
     public static class RecurringItem {
-        public String id;
-        public String content;
-        public String details;
-        public double amount;
-        public double currentAmount;
+        public String categoryName;
+        public double totalAmount;
+        public List<DailyTransactions.DailyItem> dailyItems = new ArrayList<DailyTransactions.DailyItem>();
 
-        public RecurringItem(String id, String content, String details, double amount) {
-            this.id = id;
-            this.content = content;
-            this.details = details;
-            this.amount = amount;
-            this.currentAmount = 0.0;
+
+        public RecurringItem(String name) {
+            this.categoryName = name;
+            this.totalAmount = 0.0;
+
+            for (int k = 0; k<3; k++) {
+                dailyItems.add(new DailyTransactions.DailyItem("Test daily"));
+            }
+        }
+
+        public double getTotal() {
+            if (dailyItems != null) {
+                double total = 0.0;
+                for (DailyTransactions.DailyItem k : dailyItems) {
+                    total += k.amount;
+                }
+                return total;
+            } else {
+                return 0.0;
+            }
         }
 
         @Override
         public String toString() {
-            return content;
+            return this.categoryName;
         }
     }
 }

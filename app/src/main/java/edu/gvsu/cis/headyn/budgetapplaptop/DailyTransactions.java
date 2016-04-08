@@ -16,32 +16,29 @@ public class DailyTransactions {
     /**
      * An array of recurring transactions
      */
-    public static List<RecurringItem> recurringItems = new ArrayList<RecurringItem>();
+    public static List<DailyItem> dailyItems = new ArrayList<DailyItem>();
 
     /**
      * A map of recurring transactions, by ID.
      */
-    public static final Map<String, RecurringItem> ITEM_MAP = new HashMap<String, RecurringItem>();
+    public static final Map<String, DailyItem> ITEM_MAP = new HashMap<String, DailyItem>();
 
     private static final int COUNT = 5;
-
-    private int numCategories;
-    private String categoryName;
 
     static {
         // Add some sample items.
         for (int i = 1; i <= COUNT; i++) {
-            addItem(createRecurringItem("Test transaction."));
+            addItem(createDailyItem("Test daily."));
         }
     }
 
-    private static void addItem(RecurringItem item) {
-        recurringItems.add(item);
-        ITEM_MAP.put(item.categoryName, item);
+    private static void addItem(DailyItem item) {
+        dailyItems.add(item);
+        ITEM_MAP.put(item.name, item);
     }
 
-    public static RecurringItem createRecurringItem(String name) {
-        return new RecurringItem(name);
+    public static DailyItem createDailyItem(String name) {
+        return new DailyItem(name);
     }
 
     private static String makeDetails(int position) {
@@ -56,25 +53,18 @@ public class DailyTransactions {
     /**
      * A recurring transaction object.
      */
-    public static class RecurringItem {
-        public String categoryName;
-        public double totalAmount;
+    public static class DailyItem {
+        public String name;
+        public double amount;
 
-
-        public RecurringItem(String name) {
-            this.categoryName = name;
-            this.totalAmount = 0.0;
-        }
-
-        // Will return total of all transactions
-
-        public double getTotal() {
-            return 5.0;
+        public DailyItem(String name) {
+            this.name = name;
+            this.amount = 0.0;
         }
 
         @Override
         public String toString() {
-            return this.categoryName;
+            return this.name;
         }
     }
 }

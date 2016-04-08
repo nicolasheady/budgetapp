@@ -38,7 +38,8 @@
             android:layout_marginTop="10dp"
             android:clickable="true"
             android:onClick="onClick"
-            android:text="Add Item"/>
+            android:text="Add Item"
+            android:id="@+id/addButton" />
 
     </LinearLayout>
 

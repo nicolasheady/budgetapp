@@ -51,7 +51,7 @@ public class RecurringFragment extends Fragment {
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(RecurringTransactions.ITEMS));
+        recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(RecurringTransactions.recurringItems));
     }
 
     public class SimpleItemRecyclerViewAdapter
@@ -72,16 +72,18 @@ public class RecurringFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
+            final int listPosition = position;
             holder.mItem = mValues.get(position);
-            holder.mIdView.setText(mValues.get(position).id);
-            holder.mContentView.setText(mValues.get(position).content);
+            holder.mIdView.setText(mValues.get(position).categoryName);
+            double total = mValues.get(position).totalAmount;
+            holder.mContentView.setText(String.format("%1$,.2f", total));
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mTwoPane) {
                         Bundle arguments = new Bundle();
-                        arguments.putString(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+                        arguments.putString(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.categoryName);
                         android.app.Fragment fragment = new android.app.Fragment();
                         fragment.setArguments(arguments);
                         getFragmentManager().beginTransaction()
@@ -90,7 +92,8 @@ public class RecurringFragment extends Fragment {
                     } else {
                         Context context = v.getContext();
                         Intent intent = new Intent(context, ItemDetailActivity.class);
-                        intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.id);
+                        intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.categoryName);
+                        intent.putExtra("List Position", listPosition);
 
                         context.startActivity(intent);
                     }

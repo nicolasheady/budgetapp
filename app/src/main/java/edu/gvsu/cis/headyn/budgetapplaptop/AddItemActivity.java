@@ -1,11 +1,13 @@
 package edu.gvsu.cis.headyn.budgetapplaptop;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -19,6 +21,9 @@ import android.widget.Toast;
 public class AddItemActivity extends ActionBarActivity {
 
     //private DBHelper myDb;
+    private EditText name;
+    private EditText amount;
+    private Button setButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +44,18 @@ public class AddItemActivity extends ActionBarActivity {
 
         //myDb = DBHelper.getInstance(this);
 
+        this.name = (EditText) findViewById(R.id.name);
+        this.amount = (EditText) findViewById(R.id.amount);
+        this.setButton = (Button) findViewById(R.id.addButton);
+
+        Intent previous = getIntent();
+
+        // If this activity was launch by clicking on a transaction, change titles appropriately:
+        if (!previous.getStringExtra("Previous Activity").equals("Fab")) {
+            this.name.setText(previous.getStringExtra("Name"));
+            this.amount.setText(previous.getStringExtra("Amount"));
+            this.setButton.setText("Save");
+        }
     }
 
     public void onClick(View v) {
