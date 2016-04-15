@@ -17,6 +17,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
+
 import edu.gvsu.cis.headyn.budgetapplaptop.fragments.DailyFragment;
 import edu.gvsu.cis.headyn.budgetapplaptop.fragments.RecurringFragment;
 import edu.gvsu.cis.headyn.budgetapplaptop.fragments.SettingsFragment;
@@ -28,6 +33,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Firebase.setAndroidContext(this);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -47,9 +53,24 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
+        Firebase myFirebaseRef = new Firebase("https://popping-fire-7900.firebaseio.com/");
+        myFirebaseRef.child("message").setValue("Test Message");
+
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //Firebase Event Listener
+        myFirebaseRef.child("message").addValueEventListener(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                System.out.println(snapshot.getValue());  //prints "Test Message"
+            }
+
+            @Override public void onCancelled(FirebaseError error) { }
+
+        });
     }
 
     @Override
