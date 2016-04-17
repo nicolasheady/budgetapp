@@ -28,7 +28,7 @@ public class RecurringTransactions {
     static {
         // Add some sample items.
         for (int i = 1; i <= COUNT; i++) {
-            addItem(createRecurringItem("Test recurring."));
+            createRecurringItem("Test recurring.", 0.0);
         }
     }
 
@@ -37,8 +37,10 @@ public class RecurringTransactions {
         ITEM_MAP.put(item.categoryName, item);
     }
 
-    public static RecurringItem createRecurringItem(String name) {
-        return new RecurringItem(name);
+    public static RecurringItem createRecurringItem(String name, double amount) {
+        RecurringItem transaction = new RecurringItem(name, amount);
+        addItem(transaction);
+        return transaction;
     }
 
     private static String makeDetails(int position) {
@@ -59,12 +61,12 @@ public class RecurringTransactions {
         public List<DailyTransactions.DailyItem> dailyItems = new ArrayList<DailyTransactions.DailyItem>();
 
 
-        public RecurringItem(String name) {
+        public RecurringItem(String name, double amount) {
             this.categoryName = name;
-            this.totalAmount = 0.0;
+            this.totalAmount = amount;
 
             for (int k = 0; k<3; k++) {
-                dailyItems.add(new DailyTransactions.DailyItem("Test daily"));
+                dailyItems.add(new DailyTransactions.DailyItem("Test recurring items", 0.0));
             }
         }
 

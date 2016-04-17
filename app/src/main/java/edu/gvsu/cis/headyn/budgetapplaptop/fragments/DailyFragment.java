@@ -30,11 +30,13 @@ public class DailyFragment extends Fragment {
 
     public DailyFragment(){}
 
+    public View recyclerView;
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View myView = inflater.inflate(R.layout.fragment_daily, container, false);
 
-        View recyclerView = myView.findViewById(R.id.daily_item_list);
+        recyclerView = myView.findViewById(R.id.daily_item_list);
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
 

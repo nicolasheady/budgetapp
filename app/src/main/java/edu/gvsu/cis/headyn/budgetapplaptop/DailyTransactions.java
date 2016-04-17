@@ -27,8 +27,8 @@ public class DailyTransactions {
 
     static {
         // Add some sample items.
-        for (int i = 1; i <= COUNT; i++) {
-            addItem(createDailyItem("Test daily."));
+        for (int i = 0; i < COUNT; i++) {
+            createDailyItem("Test daily.", 0.0);
         }
     }
 
@@ -37,8 +37,10 @@ public class DailyTransactions {
         ITEM_MAP.put(item.name, item);
     }
 
-    public static DailyItem createDailyItem(String name) {
-        return new DailyItem(name);
+    public static DailyItem createDailyItem(String name, double amount) {
+        DailyItem transaction = new DailyItem(name, amount);
+        addItem(transaction);
+        return transaction;
     }
 
     private static String makeDetails(int position) {
@@ -57,13 +59,17 @@ public class DailyTransactions {
         public String name;
         public double amount;
 
-        public DailyItem(String name) {
+        public DailyItem(String name, double amount) {
             this.name = name;
-            this.amount = 0.0;
+            this.amount = amount;
         }
 
         @Override
         public String toString() {
+            return this.name;
+        }
+
+        public String getName() {
             return this.name;
         }
     }

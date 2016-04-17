@@ -51,7 +51,7 @@ public class AddItemActivity extends ActionBarActivity {
         Intent previous = getIntent();
 
         // If this activity was launch by clicking on a transaction, change titles appropriately:
-        if (!previous.getStringExtra("Previous Activity").equals("Fab")) {
+        if (!previous.getStringExtra("Previous Activity").equals("AddItem")) {
             this.name.setText(previous.getStringExtra("Name"));
             this.amount.setText(previous.getStringExtra("Amount"));
             this.setButton.setText("Save");
@@ -65,6 +65,13 @@ public class AddItemActivity extends ActionBarActivity {
 
         String name = nameView.getText().toString();
         String amountStr = amountView.getText().toString();
+        double amount = Double.parseDouble(amountStr);
+
+        Intent answer = new Intent();
+        answer.putExtra("transName", name);
+        answer.putExtra("amount", amount);
+        setResult (RESULT_OK, answer); // pass the result to the caller of this activity
+
 
         Context context = getApplicationContext();
         CharSequence text;
