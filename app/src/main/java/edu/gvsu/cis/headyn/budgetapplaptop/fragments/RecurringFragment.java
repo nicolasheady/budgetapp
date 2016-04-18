@@ -29,6 +29,7 @@ import edu.gvsu.cis.headyn.budgetapplaptop.RecurringTransactions;
 public class RecurringFragment extends Fragment {
 
     private boolean mTwoPane;
+    private  double totalAmount;
 
     public RecurringFragment(){}
 
@@ -52,6 +53,10 @@ public class RecurringFragment extends Fragment {
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(RecurringTransactions.recurringItems));
+
+        for (RecurringTransactions.RecurringItem item : RecurringTransactions.recurringItems) {
+            totalAmount += item.totalAmount;
+        }
     }
 
     public class SimpleItemRecyclerViewAdapter

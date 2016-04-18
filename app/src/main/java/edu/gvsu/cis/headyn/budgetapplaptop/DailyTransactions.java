@@ -37,6 +37,10 @@ public class DailyTransactions {
         ITEM_MAP.put(item.name, item);
     }
 
+    public static void addToMap(DailyItem item) {
+        ITEM_MAP.put(item.name, item);
+    }
+
     public static DailyItem createDailyItem(String name, double amount) {
         DailyItem transaction = new DailyItem(name, amount);
         addItem(transaction);

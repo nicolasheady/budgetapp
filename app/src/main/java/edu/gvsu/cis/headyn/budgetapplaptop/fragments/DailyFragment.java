@@ -1,5 +1,6 @@
 package edu.gvsu.cis.headyn.budgetapplaptop.fragments;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +18,7 @@ import edu.gvsu.cis.headyn.budgetapplaptop.AddItemActivity;
 import edu.gvsu.cis.headyn.budgetapplaptop.DailyTransactions;
 import edu.gvsu.cis.headyn.budgetapplaptop.ItemDetailActivity;
 import edu.gvsu.cis.headyn.budgetapplaptop.ItemDetailFragment;
+import edu.gvsu.cis.headyn.budgetapplaptop.MainActivity;
 import edu.gvsu.cis.headyn.budgetapplaptop.R;
 import edu.gvsu.cis.headyn.budgetapplaptop.RecurringTransactions;
 
@@ -31,6 +33,7 @@ public class DailyFragment extends Fragment {
     public DailyFragment(){}
 
     public View recyclerView;
+
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -71,7 +74,7 @@ public class DailyFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
+        public void onBindViewHolder(final ViewHolder holder, final int position) {
             holder.mItem = mValues.get(position);
             holder.mIdView.setText(mValues.get(position).name);
             double total = mValues.get(position).amount;
@@ -97,8 +100,10 @@ public class DailyFragment extends Fragment {
                         intent.putExtra("Previous Activity", "DailyFragment");
                         intent.putExtra("Name", itemName);
                         intent.putExtra("Amount", itemAmount);
+                        intent.putExtra("Position", position);
 
-                        context.startActivity(intent);
+                        getActivity().startActivityForResult(intent, 0xFACD);
+                        //context.startActivity(intent);
                     }
                 }
             });

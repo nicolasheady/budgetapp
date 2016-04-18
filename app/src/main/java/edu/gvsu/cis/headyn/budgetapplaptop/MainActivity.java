@@ -70,7 +70,9 @@ public class MainActivity extends AppCompatActivity
         }
 
         if (prefs.contains("Recurring_Exps")) {
-            recurringTraxs.recurringItems = getRecurring();
+            ArrayList<RecurringTransactions.RecurringItem> list = getRecurring();
+            recurringTraxs.recurringItems = list;
+            recurringTraxs.addToMap(list);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -174,11 +176,11 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         if (resultCode == RESULT_OK && requestCode == 0xFACE) {
 
             String result = data.getStringExtra("transName");
             double amount = data.getDoubleExtra("amount", 0.0);
-
             FragmentManager fm = getFragmentManager();
 
             if (currentFragment.equals("Daily")) {
@@ -195,6 +197,24 @@ public class MainActivity extends AppCompatActivity
 
                 saveRecurring(recurringTraxs.recurringItems);
             }
+
+        // Overwrites a transaction if user was editing one
+        } else if (resultCode == RESULT_OK && requestCode == 0xFACD) {
+
+            String result = data.getStringExtra("transName");
+            double amount = data.getDoubleExtra("amount", 0.0);
+            FragmentManager fm = getFragmentManager();
+
+            int position = data.getIntExtra("Position", 0);
+            dailyTraxs.dailyItems.get(position).name = result;
+            dailyTraxs.dailyItems.get(position).amount = amount;
+            dailyTraxs.addToMap(dailyTraxs.dailyItems.get(position));
+
+            fm.beginTransaction()
+                    .replace(R.id.content_frame, new DailyFragment()).commit();
+
+            saveDaily(dailyTraxs.dailyItems);
+
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }

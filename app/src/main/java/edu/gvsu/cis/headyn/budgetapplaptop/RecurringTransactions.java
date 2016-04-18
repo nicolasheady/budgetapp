@@ -37,6 +37,12 @@ public class RecurringTransactions {
         ITEM_MAP.put(item.categoryName, item);
     }
 
+    public static void addToMap(List<RecurringItem> list) {
+        for (RecurringItem item : list) {
+            ITEM_MAP.put(item.categoryName, item);
+        }
+    }
+
     public static RecurringItem createRecurringItem(String name, double amount) {
         RecurringItem transaction = new RecurringItem(name, amount);
         addItem(transaction);
@@ -67,6 +73,10 @@ public class RecurringTransactions {
 
             for (int k = 0; k<3; k++) {
                 dailyItems.add(new DailyTransactions.DailyItem("Test recurring items", 0.0));
+            }
+
+            for (DailyTransactions.DailyItem item : dailyItems) {
+                totalAmount += item.amount;
             }
         }
 

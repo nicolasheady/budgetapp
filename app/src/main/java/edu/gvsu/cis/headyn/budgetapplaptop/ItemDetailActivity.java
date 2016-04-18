@@ -36,6 +36,7 @@ public class ItemDetailActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
 
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,6 +46,7 @@ public class ItemDetailActivity extends AppCompatActivity {
             }
         });
 
+
         Intent previous = getIntent();
         this.listPosition = previous.getIntExtra("List Position", 0);
 
@@ -53,6 +55,7 @@ public class ItemDetailActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
 
         // savedInstanceState is non-null when there is fragment state
         // saved from previous configurations of this activity
@@ -81,7 +84,7 @@ public class ItemDetailActivity extends AppCompatActivity {
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
 
-        /*
+        // TODO: mTwoPane is being set to true and not sure why. Causing AddItem to not open.
         if (findViewById(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-w900dp).
@@ -89,7 +92,7 @@ public class ItemDetailActivity extends AppCompatActivity {
             // activity should be in two-pane mode.
             mTwoPane = true;
         }
-        */
+
     }
 
     @Override

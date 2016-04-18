@@ -24,6 +24,7 @@ public class AddItemActivity extends ActionBarActivity {
     private EditText name;
     private EditText amount;
     private Button setButton;
+    private int position;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +56,7 @@ public class AddItemActivity extends ActionBarActivity {
             this.name.setText(previous.getStringExtra("Name"));
             this.amount.setText(previous.getStringExtra("Amount"));
             this.setButton.setText("Save");
+            this.position = previous.getIntExtra("Position", 0);
         }
     }
 
@@ -70,6 +72,7 @@ public class AddItemActivity extends ActionBarActivity {
         Intent answer = new Intent();
         answer.putExtra("transName", name);
         answer.putExtra("amount", amount);
+        answer.putExtra("Position", position);
         setResult (RESULT_OK, answer); // pass the result to the caller of this activity
 
 
