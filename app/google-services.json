@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_id": "simple-budget-ee3aa",
+    "project_number": "906159610943",
+    "name": "Simple Budget"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:906159610943:android:4e48fa1d82878ce7",
+        "client_id": "android:edu.gvsu.cis.headyn.budgetapplaptop",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "edu.gvsu.cis.headyn.budgetapplaptop",
+          "certificate_hash": []
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "906159610943-0nt4k72a4ofd5ee8rp9oq8ggktvhkr6f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.gvsu.cis.headyn.budgetapplaptop",
+            "certificate_hash": "55AEB1BEF84FC8B36F483EC4CF70764FDC2FFEFB"
+          }
+        },
+        {
+          "client_id": "906159610943-fi4iscubf7fe1305dvsq5cc0apd9kmmc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}
