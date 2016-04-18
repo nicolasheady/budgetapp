@@ -28,6 +28,12 @@ public class ItemDetailActivity extends AppCompatActivity {
 
     private boolean mTwoPane;
     private int listPosition = 0;
+    public String catName;
+    public double catAmount;
+
+    public void testMethod() {
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,9 +96,8 @@ public class ItemDetailActivity extends AppCompatActivity {
             // large-screen layouts (res/values-w900dp).
             // If this view is present, then the
             // activity should be in two-pane mode.
-            mTwoPane = true;
+            //mTwoPane = true;
         }
-
     }
 
     @Override
@@ -109,6 +114,19 @@ public class ItemDetailActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Call the main activity to change category name?
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {

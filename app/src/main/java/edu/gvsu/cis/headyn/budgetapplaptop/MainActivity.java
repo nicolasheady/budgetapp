@@ -87,6 +87,12 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        // Opens daily expenses on app launch
+        Fragment fragment = new DailyFragment();
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.content_frame, fragment).commit();
+
         //Firebase Event Listener
         myFirebaseRef.child("message").addValueEventListener(new ValueEventListener() {
 
@@ -95,7 +101,9 @@ public class MainActivity extends AppCompatActivity
                 System.out.println(snapshot.getValue());  //prints "Test Message"
             }
 
-            @Override public void onCancelled(FirebaseError error) { }
+            @Override
+            public void onCancelled(FirebaseError error) {
+            }
 
         });
     }
@@ -136,7 +144,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        Fragment fragment= null;
+        Fragment fragment = null;
         int id = item.getItemId();
 
         if (id == R.id.daily) {
