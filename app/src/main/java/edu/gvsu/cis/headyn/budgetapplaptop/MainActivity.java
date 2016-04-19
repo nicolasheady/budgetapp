@@ -90,7 +90,8 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
         Firebase myFirebaseRef = new Firebase("https://popping-fire-7900.firebaseio.com/");
-        myFirebaseRef.child("message").setValue("Test Message");
+        myFirebaseRef.child("message").setValue(23);
+        myFirebaseRef.child("message2").setValue(45);
 
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
