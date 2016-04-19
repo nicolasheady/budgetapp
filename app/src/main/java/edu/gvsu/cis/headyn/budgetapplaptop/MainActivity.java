@@ -65,6 +65,15 @@ public class MainActivity extends AppCompatActivity
 
         currentFragment = "Daily";
 
+        // If returning from Recurring fragment, we update category
+        // with new name and amount
+        if (getIntent() != null) {
+            Intent fromRecur = getIntent();
+            String catName = fromRecur.getStringExtra("catName");
+            double catAmount = fromRecur.getDoubleExtra("catAmount", 0.0);
+            int listPosition = fromRecur.getIntExtra("listPosition", 0);
+        }
+
         if (prefs.contains("Daily_Exps")) {
             dailyTraxs.dailyItems = getDaily();
         }
@@ -232,6 +241,18 @@ public class MainActivity extends AppCompatActivity
         Intent launchAddItem = new Intent(this, AddItemActivity.class);
         launchAddItem.putExtra("Previous Activity", "AddItem");
         startActivityForResult(launchAddItem, 0xFACE);
+    }
+
+    private void changeRecurring(int position, double amount, String name) {
+        if (recurringTraxs.recurringItems.get(position).categoryName != name) {
+            //change name and amount.
+            recurringTraxs.recurringItems.get(position).categoryName = name;
+            recurringTraxs.recurringItems.get(position).totalAmount = amount;
+
+            saveRecurring(recurringTraxs.recurringItems);
+
+            // Need to refresh view?
+        }
     }
 
     private void saveDaily(List<DailyTransactions.DailyItem> items) {

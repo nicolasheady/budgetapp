@@ -8,14 +8,19 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/item_detail"
         style="?android:attr/textAppearanceLarge"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textIsSelectable="true"
         tools:context="edu.gvsu.cis.headyn.budgetapplaptop.ItemDetailFragment"
         android:text="Title"
         android:editable="false"
-        android:textSize="20dp"
-        android:textAlignment="center" />
+        android:textSize="25dp"
+        android:textAlignment="center"
+        android:layout_centerHorizontal="true"
+        android:enabled="true"
+        android:layout_marginTop="20dp"
+        android:clickable="false"
+        android:inputType="text" />
 
     <EditText
         style="?android:attr/textAppearanceLarge"
@@ -32,9 +37,12 @@
         android:textAlignment="textStart"
         android:layout_alignParentTop="false"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="40dp"
         android:layout_alignTop="@+id/item_detail"
-        android:layout_alignParentLeft="false" />
+        android:layout_alignParentLeft="false"
+        android:enabled="true"
+        android:clickable="false"
+        android:inputType="numberDecimal" />
 
     <TextView
         android:layout_width="wrap_content"

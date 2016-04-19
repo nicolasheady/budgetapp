@@ -30,10 +30,7 @@ public class ItemDetailActivity extends AppCompatActivity {
     private int listPosition = 0;
     public String catName;
     public double catAmount;
-
-    public void testMethod() {
-
-    }
+    MainActivity main;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +38,7 @@ public class ItemDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_item_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
+
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -117,16 +115,13 @@ public class ItemDetailActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        // Call the main activity to change category name?
-    }
-
-    @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();
+        Intent main = new Intent(this, MainActivity.class);
+        main.putExtra("catName", catName);
+        main.putExtra("catAmount", catAmount);
+        main.putExtra("listPosition", listPosition);
+        startActivity(main);
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
