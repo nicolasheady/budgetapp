@@ -125,8 +125,6 @@ public class AddItemActivity extends ActionBarActivity {
 
         */
         finish();
-
-
     }
 
 }

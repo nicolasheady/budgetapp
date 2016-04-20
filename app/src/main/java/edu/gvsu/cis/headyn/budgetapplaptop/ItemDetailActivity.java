@@ -115,14 +115,17 @@ public class ItemDetailActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
+    protected void onDestroy() {
+        super.onDestroy();
+
         Intent main = new Intent(this, MainActivity.class);
         main.putExtra("catName", catName);
         main.putExtra("catAmount", catAmount);
         main.putExtra("listPosition", listPosition);
 
         System.out.println("ItemDetailActivity List Position-------: " + listPosition);
+        System.out.println("ItemDetailActivity Name-------: " + catName);
+        System.out.println("ItemDetailActivity Amount-------: " + catAmount);
         startActivity(main);
     }
 

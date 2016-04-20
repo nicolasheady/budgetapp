@@ -75,11 +75,14 @@ public class ItemDetailFragment extends Fragment {
         return rootView;
     }
 
+
+
     @Override
     public void onDestroy() {
         super.onDestroy();
 
-        ((ItemDetailActivity)getActivity()).catName = item_detail.getText().toString();
+        System.out.println("ItemDetailFragmet getAct: " + getActivity());
+        ((ItemDetailActivity) getActivity()).catName = item_detail.getText().toString();
         String amount = item_amount.getText().toString();
         ((ItemDetailActivity)getActivity()).catAmount = Double.parseDouble(amount);
 

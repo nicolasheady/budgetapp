@@ -104,10 +104,17 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         // Opens daily expenses on app launch
-        Fragment fragment = new DailyFragment();
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.content_frame, fragment).commit();
+        if (getIntent().getStringExtra("catName") == null) {
+            Fragment fragment = new DailyFragment();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.content_frame, fragment).commit();
+        } else {
+            Fragment fragment = new RecurringFragment();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.content_frame, fragment).commit();
+        }
 
         //Firebase Event Listener
         myFirebaseRef.child("message").addValueEventListener(new ValueEventListener() {
