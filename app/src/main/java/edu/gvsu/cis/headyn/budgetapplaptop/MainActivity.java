@@ -72,6 +72,12 @@ public class MainActivity extends AppCompatActivity
             String catName = fromRecur.getStringExtra("catName");
             double catAmount = fromRecur.getDoubleExtra("catAmount", 0.0);
             int listPosition = fromRecur.getIntExtra("listPosition", 0);
+
+            System.out.println("Cat Name-------: " + catName);
+            System.out.println("Cat Amount-------: " + catAmount);
+            System.out.println("List Position-------: " + listPosition);
+
+            changeRecurring(listPosition, catAmount, catName);
         }
 
         if (prefs.contains("Daily_Exps")) {
@@ -245,10 +251,18 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void changeRecurring(int position, double amount, String name) {
-        if (recurringTraxs.recurringItems.get(position).categoryName != name) {
+        RecurringTransactions.RecurringItem itemToChange = recurringTraxs.recurringItems.get(position);
+        String oldName = itemToChange.categoryName;
+
+        if (itemToChange.categoryName != name || itemToChange.totalAmount != amount) {
             //change name and amount.
-            recurringTraxs.recurringItems.get(position).categoryName = name;
-            recurringTraxs.recurringItems.get(position).totalAmount = amount;
+            itemToChange.categoryName = name;
+            itemToChange.totalAmount = amount;
+            recurringTraxs.recurringItems.set(position, itemToChange);
+
+            //Remove old entry and create new for ITEM_MAP
+            recurringTraxs.ITEM_MAP.remove(oldName);
+            recurringTraxs.ITEM_MAP.put(name, itemToChange);
 
             saveRecurring(recurringTraxs.recurringItems);
 

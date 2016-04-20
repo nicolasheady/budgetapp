@@ -121,6 +121,8 @@ public class ItemDetailActivity extends AppCompatActivity {
         main.putExtra("catName", catName);
         main.putExtra("catAmount", catAmount);
         main.putExtra("listPosition", listPosition);
+
+        System.out.println("ItemDetailActivity List Position-------: " + listPosition);
         startActivity(main);
     }
 
