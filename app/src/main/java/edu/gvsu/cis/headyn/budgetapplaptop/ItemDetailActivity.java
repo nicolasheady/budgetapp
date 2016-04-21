@@ -1,8 +1,11 @@
 package edu.gvsu.cis.headyn.budgetapplaptop;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -74,6 +77,8 @@ public class ItemDetailActivity extends AppCompatActivity {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
+            arguments.putInt("ListPosition", listPosition);
+
             arguments.putString(ItemDetailFragment.ARG_ITEM_ID,
                     getIntent().getStringExtra(ItemDetailFragment.ARG_ITEM_ID));
             ItemDetailFragment fragment = new ItemDetailFragment();
@@ -112,21 +117,6 @@ public class ItemDetailActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        Intent main = new Intent(this, MainActivity.class);
-        main.putExtra("catName", catName);
-        main.putExtra("catAmount", catAmount);
-        main.putExtra("listPosition", listPosition);
-
-        System.out.println("ItemDetailActivity List Position-------: " + listPosition);
-        System.out.println("ItemDetailActivity Name-------: " + catName);
-        System.out.println("ItemDetailActivity Amount-------: " + catAmount);
-        startActivity(main);
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
@@ -176,8 +166,9 @@ public class ItemDetailActivity extends AppCompatActivity {
                         intent.putExtra("Previous Activity", "RecurringTransFragment");
                         intent.putExtra("Name", itemName);
                         intent.putExtra("Amount", itemAmount);
+                        intent.putExtra("ListPosition", listPosition);
 
-                        context.startActivity(intent);
+                        startActivityForResult(intent, 0xFACE);
                     }
                 }
             });

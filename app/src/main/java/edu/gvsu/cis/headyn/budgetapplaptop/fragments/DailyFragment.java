@@ -53,6 +53,8 @@ public class DailyFragment extends Fragment {
         return myView;
     }
 
+
+
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(DailyTransactions.dailyItems));
     }

@@ -26,7 +26,9 @@ import com.firebase.client.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.gvsu.cis.headyn.budgetapplaptop.fragments.DailyFragment;
 import edu.gvsu.cis.headyn.budgetapplaptop.fragments.RecurringFragment;
@@ -65,21 +67,6 @@ public class MainActivity extends AppCompatActivity
 
         currentFragment = "Daily";
 
-        // If returning from Recurring fragment, we update category
-        // with new name and amount
-        if (getIntent() != null) {
-            Intent fromRecur = getIntent();
-            String catName = fromRecur.getStringExtra("catName");
-            double catAmount = fromRecur.getDoubleExtra("catAmount", 0.0);
-            int listPosition = fromRecur.getIntExtra("listPosition", 0);
-
-            System.out.println("Cat Name-------: " + catName);
-            System.out.println("Cat Amount-------: " + catAmount);
-            System.out.println("List Position-------: " + listPosition);
-
-            changeRecurring(listPosition, catAmount, catName);
-        }
-
         if (prefs.contains("Daily_Exps")) {
             dailyTraxs.dailyItems = getDaily();
         }
@@ -104,7 +91,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         // Opens daily expenses on app launch
-        if (getIntent().getStringExtra("catName") == null) {
+        if (!prefs.contains("Recur_Edit_Position")) {
             Fragment fragment = new DailyFragment();
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction()
@@ -129,6 +116,44 @@ public class MainActivity extends AppCompatActivity
             }
 
         });
+    }
+
+    @Override
+    protected void onResume() {
+
+        System.out.println("PRINTINT ALL MAP ENTRIES::::::::");
+        Map<String, RecurringTransactions.RecurringItem> map = recurringTraxs.ITEM_MAP;
+        for (Map.Entry<String,RecurringTransactions.RecurringItem> entry : map.entrySet()) {
+            String key = entry.getKey();
+           // String value = entry.getValue();
+            System.out.println(key);
+        }
+
+        System.out.println("onResume called!");
+
+        if (prefs.contains("Recur_Edit_Position")) {
+
+            System.out.println("onResume: Prefs DOES contain Recur_Edit_Position!");
+
+            int position = prefs.getInt("Recur_Edit_Position", 0);
+            String catName = prefs.getString("Recur_Edit_Name", "Category");
+            double catAmount = Double.longBitsToDouble(prefs.getLong("Recur_Edit_Amount", 0));
+
+            System.out.println("Name : " + catName);
+            System.out.println("Amount : " + catAmount);
+            System.out.println("List Position : " + position);
+
+            changeRecurring(position, catAmount, catName);
+        }
+
+        SharedPreferences.Editor ped = prefs.edit();
+        ped.remove("Recur_Edit_Position");
+        ped.remove("Recur_Edit_Name");
+        ped.remove("Recur_Edit_Amount");
+        ped.commit();
+
+        super.onResume();
+
     }
 
     @Override
@@ -297,8 +322,9 @@ public class MainActivity extends AppCompatActivity
             String itemName = prefs.getString("daily_" + k, null);
             double itemAmount = Double.longBitsToDouble(prefs.getLong("daily_amount_" + k, 0));
 
-            DailyTransactions.DailyItem item = new DailyTransactions.DailyItem(itemName, itemAmount);
-            dailyExps.add(item);
+            dailyTraxs.createDailyItem(itemName, itemAmount);
+            //DailyTransactions.DailyItem item = new DailyTransactions.DailyItem(itemName, itemAmount);
+            //dailyExps.add(item);
         }
         return dailyExps;
     }
@@ -358,5 +384,18 @@ public class MainActivity extends AppCompatActivity
         }
 
         return recurringExps;
+    }
+
+    public static class SaveUtility {
+
+        public RecurringTransactions recurringTraxs;
+
+        public SaveUtility() {
+            recurringTraxs = new RecurringTransactions();
+        }
+
+        public static void saveNewTransaction() {
+
+        }
     }
 }

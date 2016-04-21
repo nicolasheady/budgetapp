@@ -30,6 +30,7 @@ public class RecurringFragment extends Fragment {
 
     private boolean mTwoPane;
     private  double totalAmount;
+    private View recyclerView;
 
     public RecurringFragment(){}
 
@@ -37,7 +38,7 @@ public class RecurringFragment extends Fragment {
 
         View myView = inflater.inflate(R.layout.fragment_recurring, container, false);
 
-        View recyclerView = myView.findViewById(R.id.recurring_item_list);
+        recyclerView = myView.findViewById(R.id.recurring_item_list);
         assert recyclerView != null;
         setupRecyclerView((RecyclerView) recyclerView);
 
@@ -49,6 +50,15 @@ public class RecurringFragment extends Fragment {
             mTwoPane = true;
         }
         return myView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Refreshes recyclerView for changes to category
+        assert recyclerView != null;
+        setupRecyclerView((RecyclerView) recyclerView);
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {

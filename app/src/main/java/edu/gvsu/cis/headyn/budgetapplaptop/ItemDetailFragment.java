@@ -1,6 +1,9 @@
 package edu.gvsu.cis.headyn.budgetapplaptop;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -20,6 +23,7 @@ public class ItemDetailFragment extends Fragment {
 
     EditText item_detail;
     EditText item_amount;
+    int position;
 
     /**
      * The fragment argument representing the item ID that this fragment
@@ -43,11 +47,16 @@ public class ItemDetailFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        position = getArguments().getInt("ListPosition", 0);
+
+        System.out.println("ITEM DETAIL FRAGMENT ListPosition added: " + position);
+
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            mItem = RecurringTransactions.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
+            //mItem = RecurringTransactions.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
+            mItem = RecurringTransactions.recurringItems.get(position);
 
             Activity activity = this.getActivity();
             CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
@@ -75,16 +84,20 @@ public class ItemDetailFragment extends Fragment {
         return rootView;
     }
 
-
-
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onPause() {
+        super.onPause();
 
-        System.out.println("ItemDetailFragmet getAct: " + getActivity());
-        ((ItemDetailActivity) getActivity()).catName = item_detail.getText().toString();
-        String amount = item_amount.getText().toString();
-        ((ItemDetailActivity)getActivity()).catAmount = Double.parseDouble(amount);
+        String catName = item_detail.getText().toString();
+        double catAmount = Double.parseDouble(item_amount.getText().toString());
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor ped = prefs.edit();
+
+        ped.putInt("Recur_Edit_Position", position);
+        ped.putString("Recur_Edit_Name", catName);
+        long amount = Double.doubleToLongBits(catAmount);
+        ped.putLong("Recur_Edit_Amount", amount);
+        ped.commit();
     }
 }

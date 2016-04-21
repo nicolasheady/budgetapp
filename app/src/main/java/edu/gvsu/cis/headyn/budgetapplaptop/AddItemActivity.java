@@ -20,10 +20,18 @@ import android.widget.Toast;
 
 public class AddItemActivity extends ActionBarActivity {
 
+    OnHeadlineSelectedListener mCallback;
+
+    // Container Activity must implement this interface
+    public interface OnHeadlineSelectedListener {
+        public void onArticleSelected(int position);
+    }
+
     //private DBHelper myDb;
     private EditText name;
     private EditText amount;
     private Button setButton;
+    private Button deleteButton;
     private int position;
 
     @Override
@@ -48,6 +56,7 @@ public class AddItemActivity extends ActionBarActivity {
         this.name = (EditText) findViewById(R.id.name);
         this.amount = (EditText) findViewById(R.id.amount);
         this.setButton = (Button) findViewById(R.id.addButton);
+        this.deleteButton = (Button) findViewById(R.id.deleteButton);
 
         Intent previous = getIntent();
 
@@ -62,18 +71,29 @@ public class AddItemActivity extends ActionBarActivity {
 
     public void onClick(View v) {
 
-        EditText nameView = (EditText) findViewById(R.id.name);
-        EditText amountView = (EditText) findViewById(R.id.amount);
+        if (v == setButton) {
+            EditText nameView = (EditText) findViewById(R.id.name);
+            EditText amountView = (EditText) findViewById(R.id.amount);
 
-        String name = nameView.getText().toString();
-        String amountStr = amountView.getText().toString();
-        double amount = Double.parseDouble(amountStr);
+            String name = nameView.getText().toString();
+            String amountStr = amountView.getText().toString();
+            double amount = Double.parseDouble(amountStr);
 
-        Intent answer = new Intent();
-        answer.putExtra("transName", name);
-        answer.putExtra("amount", amount);
-        answer.putExtra("Position", position);
-        setResult (RESULT_OK, answer); // pass the result to the caller of this activity
+            Intent answer = new Intent();
+            answer.putExtra("transName", name);
+            answer.putExtra("amount", amount);
+            answer.putExtra("Position", position);
+            setResult (RESULT_OK, answer); // pass the result to the caller of this activity
+
+        } else if (v == deleteButton) {
+
+
+        }
+
+        //What if statement to put this under?
+        MainActivity.SaveUtility saver = new MainActivity.SaveUtility();
+        saver.saveNewTransaction();
+
 
 
         Context context = getApplicationContext();

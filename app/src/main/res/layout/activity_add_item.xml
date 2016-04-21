@@ -41,6 +41,14 @@
             android:text="Add Item"
             android:id="@+id/addButton" />
 
+        <Button
+            android:layout_width="148dp"
+            android:layout_height="29dp"
+            android:text="DELETE"
+            android:id="@+id/deleteButton"
+            android:layout_gravity="center_horizontal"
+            android:background="@android:color/holo_red_light" />
+
     </LinearLayout>
 
 </LinearLayout>
