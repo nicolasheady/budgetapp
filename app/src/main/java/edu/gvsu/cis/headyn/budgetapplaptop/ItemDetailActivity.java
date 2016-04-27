@@ -48,14 +48,13 @@ public class ItemDetailActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own detail action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                launchAddItem();
             }
         });
 
 
         Intent previous = getIntent();
-        this.listPosition = previous.getIntExtra("List Position", 0);
+        this.listPosition = previous.getIntExtra("RecurPosition", 0);
 
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
@@ -104,6 +103,14 @@ public class ItemDetailActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        View recyclerView = findViewById(R.id.recurringExps_item_list);
+        assert recyclerView != null;
+        setupRecyclerView((RecyclerView) recyclerView);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
@@ -117,6 +124,15 @@ public class ItemDetailActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+
+    private void launchAddItem() {
+        Intent launchAddItem = new Intent(this, AddItemActivity.class);
+        launchAddItem.putExtra("Previous Activity", "AddSubItem");
+        launchAddItem.putExtra("RecurPosition", listPosition);
+        startActivityForResult(launchAddItem, 0xFACE);
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
@@ -140,7 +156,7 @@ public class ItemDetailActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
+        public void onBindViewHolder(final ViewHolder holder, final int position) {
             holder.mItem = mValues.get(position);
             holder.mIdView.setText(mValues.get(position).name);
             double total = mValues.get(position).amount;
@@ -166,7 +182,8 @@ public class ItemDetailActivity extends AppCompatActivity {
                         intent.putExtra("Previous Activity", "RecurringTransFragment");
                         intent.putExtra("Name", itemName);
                         intent.putExtra("Amount", itemAmount);
-                        intent.putExtra("ListPosition", listPosition);
+                        intent.putExtra("RecurPosition", listPosition);
+                        intent.putExtra("SubItemPosition", position);
 
                         startActivityForResult(intent, 0xFACE);
                     }

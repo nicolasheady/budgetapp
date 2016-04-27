@@ -1,6 +1,8 @@
 package edu.gvsu.cis.headyn.budgetapplaptop;
 
+import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -38,9 +40,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     String currentFragment;
-    SharedPreferences prefs;
-    DailyTransactions dailyTraxs;
-    RecurringTransactions recurringTraxs;
+    SaveUtility saver;
 
 
     @Override
@@ -51,31 +51,27 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        dailyTraxs = new DailyTransactions();
-        recurringTraxs = new RecurringTransactions();
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        saver = new SaveUtility(this);
+        currentFragment = "Daily";
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 launchAddItem();
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
             }
         });
 
-        currentFragment = "Daily";
-
-        if (prefs.contains("Daily_Exps")) {
-            dailyTraxs.dailyItems = getDaily();
+        if (saver.prefs.contains("Daily_Exps")) {
+            saver.dailyTraxs.dailyItems = saver.getDaily();
         }
 
-        if (prefs.contains("Recurring_Exps")) {
-            ArrayList<RecurringTransactions.RecurringItem> list = getRecurring();
-            recurringTraxs.recurringItems = list;
-            recurringTraxs.addToMap(list);
+        if (saver.prefs.contains("Recurring_Exps")) {
+            ArrayList<RecurringTransactions.RecurringItem> list = saver.getRecurring();
+            saver.recurringTraxs.recurringItems = list;
+            saver.recurringTraxs.addToMap(list);
         }
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -86,22 +82,8 @@ public class MainActivity extends AppCompatActivity
         myFirebaseRef.child("message").setValue(23);
         myFirebaseRef.child("message2").setValue(45);
 
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        // Opens daily expenses on app launch
-        if (!prefs.contains("Recur_Edit_Position")) {
-            Fragment fragment = new DailyFragment();
-            FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.content_frame, fragment).commit();
-        } else {
-            Fragment fragment = new RecurringFragment();
-            FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.content_frame, fragment).commit();
-        }
 
         //Firebase Event Listener
         myFirebaseRef.child("message").addValueEventListener(new ValueEventListener() {
@@ -121,32 +103,44 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
 
-        System.out.println("PRINTINT ALL MAP ENTRIES::::::::");
-        Map<String, RecurringTransactions.RecurringItem> map = recurringTraxs.ITEM_MAP;
+        System.out.println("::::PRINTING ALL MAP ENTRIES::::");
+
+        Map<String, RecurringTransactions.RecurringItem> map = saver.recurringTraxs.ITEM_MAP;
         for (Map.Entry<String,RecurringTransactions.RecurringItem> entry : map.entrySet()) {
             String key = entry.getKey();
-           // String value = entry.getValue();
+            // String value = entry.getValue();
             System.out.println(key);
         }
 
-        System.out.println("onResume called!");
+        if (currentFragment.equals("Daily")) {
+            Fragment fragment = new DailyFragment();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.content_frame, fragment).commit();
+        } else {
+            Fragment fragment = new RecurringFragment();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.content_frame, fragment).commit();
+        }
 
-        if (prefs.contains("Recur_Edit_Position")) {
 
-            System.out.println("onResume: Prefs DOES contain Recur_Edit_Position!");
+        // If user was editing a category, we save it
+        if (saver.prefs.contains("Recur_Edit_Position")) {
 
-            int position = prefs.getInt("Recur_Edit_Position", 0);
-            String catName = prefs.getString("Recur_Edit_Name", "Category");
-            double catAmount = Double.longBitsToDouble(prefs.getLong("Recur_Edit_Amount", 0));
+            int position = saver.prefs.getInt("Recur_Edit_Position", 0);
+            String catName = saver.prefs.getString("Recur_Edit_Name", "Category");
+            double catAmount = Double.longBitsToDouble(saver.prefs.getLong("Recur_Edit_Amount", 0));
 
             System.out.println("Name : " + catName);
             System.out.println("Amount : " + catAmount);
             System.out.println("List Position : " + position);
 
-            changeRecurring(position, catAmount, catName);
+            saver.changeRecurring(position, catAmount, catName);
         }
 
-        SharedPreferences.Editor ped = prefs.edit();
+        // Removes these "temp" saved items so they don't appear when they don't need to
+        SharedPreferences.Editor ped = saver.prefs.edit();
         ped.remove("Recur_Edit_Position");
         ped.remove("Recur_Edit_Name");
         ped.remove("Recur_Edit_Amount");
@@ -230,171 +224,189 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (resultCode == RESULT_OK && requestCode == 0xFACE) {
-
-            String result = data.getStringExtra("transName");
-            double amount = data.getDoubleExtra("amount", 0.0);
-            FragmentManager fm = getFragmentManager();
-
-            if (currentFragment.equals("Daily")) {
-                dailyTraxs.createDailyItem(result, amount);
-                fm.beginTransaction()
-                        .replace(R.id.content_frame, new DailyFragment()).commit();
-
-                saveDaily(dailyTraxs.dailyItems);
-
-            } else if (currentFragment.equals("Recurring")) {
-                recurringTraxs.createRecurringItem(result, amount);
-                fm.beginTransaction()
-                        .replace(R.id.content_frame, new RecurringFragment()).commit();
-
-                saveRecurring(recurringTraxs.recurringItems);
-            }
-
-        // Overwrites a transaction if user was editing one
-        } else if (resultCode == RESULT_OK && requestCode == 0xFACD) {
-
-            String result = data.getStringExtra("transName");
-            double amount = data.getDoubleExtra("amount", 0.0);
-            FragmentManager fm = getFragmentManager();
-
-            int position = data.getIntExtra("Position", 0);
-            dailyTraxs.dailyItems.get(position).name = result;
-            dailyTraxs.dailyItems.get(position).amount = amount;
-            dailyTraxs.addToMap(dailyTraxs.dailyItems.get(position));
-
-            fm.beginTransaction()
-                    .replace(R.id.content_frame, new DailyFragment()).commit();
-
-            saveDaily(dailyTraxs.dailyItems);
-
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
     private void launchAddItem() {
         Intent launchAddItem = new Intent(this, AddItemActivity.class);
-        launchAddItem.putExtra("Previous Activity", "AddItem");
-        startActivityForResult(launchAddItem, 0xFACE);
-    }
-
-    private void changeRecurring(int position, double amount, String name) {
-        RecurringTransactions.RecurringItem itemToChange = recurringTraxs.recurringItems.get(position);
-        String oldName = itemToChange.categoryName;
-
-        if (itemToChange.categoryName != name || itemToChange.totalAmount != amount) {
-            //change name and amount.
-            itemToChange.categoryName = name;
-            itemToChange.totalAmount = amount;
-            recurringTraxs.recurringItems.set(position, itemToChange);
-
-            //Remove old entry and create new for ITEM_MAP
-            recurringTraxs.ITEM_MAP.remove(oldName);
-            recurringTraxs.ITEM_MAP.put(name, itemToChange);
-
-            saveRecurring(recurringTraxs.recurringItems);
-
-            // Need to refresh view?
+        if (currentFragment.equals("Daily")) {
+            launchAddItem.putExtra("Previous Activity", "AddDaily");
+        } else {
+            launchAddItem.putExtra("Previous Activity", "AddRecurring");
         }
+        startActivity(launchAddItem);
     }
 
-    private void saveDaily(List<DailyTransactions.DailyItem> items) {
-        SharedPreferences.Editor ped = prefs.edit();
-        ped.putInt("Daily_Exps", items.size());
-        for (int k=0; k < items.size(); k++) {
-            String itemName = items.get(k).name;
-            double itemAmount = items.get(k).amount;
-            ped.putString("daily_" + k, itemName);
-            ped.putLong("daily_amount_" + k, Double.doubleToRawLongBits(itemAmount));
-        }
-        ped.commit();
-    }
-
-    public ArrayList<DailyTransactions.DailyItem> getDaily() {
-        int size = prefs.getInt("Daily_Exps", 0);
-        ArrayList<DailyTransactions.DailyItem> dailyExps = new ArrayList<>();
-
-        for (int k=0; k<size; k++) {
-            String itemName = prefs.getString("daily_" + k, null);
-            double itemAmount = Double.longBitsToDouble(prefs.getLong("daily_amount_" + k, 0));
-
-            dailyTraxs.createDailyItem(itemName, itemAmount);
-            //DailyTransactions.DailyItem item = new DailyTransactions.DailyItem(itemName, itemAmount);
-            //dailyExps.add(item);
-        }
-        return dailyExps;
-    }
-
-    private void saveRecurring(List<RecurringTransactions.RecurringItem> items) {
-        SharedPreferences.Editor ped = prefs.edit();
-        int numOfCategories = items.size();
-        ped.putInt("Recurring_Exps", numOfCategories);
-        for (int k=0; k < numOfCategories; k++) {
-            RecurringTransactions.RecurringItem item = items.get(k);
-            int numOfTransInCategory = item.dailyItems.size();
-
-            String itemName = item.categoryName;
-            double itemAmount = item.totalAmount;
-
-            ped.putString("recur_" + k, itemName);
-            ped.putLong("recur_amount_" + k, Double.doubleToRawLongBits(itemAmount));
-
-            ped.putInt("Recurring_Exps_" + k, numOfTransInCategory);
-
-            for (int m=0; m<numOfTransInCategory; m++) {
-                DailyTransactions.DailyItem subItem = item.dailyItems.get(m);
-
-                String subItemName = subItem.name;
-                double subItemAmount = subItem.amount;
-                ped.putString("sub_name_" + k + "_" + m, subItemName);
-                ped.putLong("sub_amount_" + k + "_" + m, Double.doubleToRawLongBits(subItemAmount));
-            }
-        }
-        ped.commit();
-    }
-
-    private ArrayList<RecurringTransactions.RecurringItem> getRecurring() {
-        int size = prefs.getInt("Recurring_Exps", 0);
-        ArrayList<RecurringTransactions.RecurringItem> recurringExps = new ArrayList<>();
-
-        for (int k=0; k<size; k++) {
-            String categoryName = prefs.getString("recur_" + k, null);
-            double totalAmount = Double.longBitsToDouble(prefs.getLong("recur_amount_" + k, 0));
-            RecurringTransactions.RecurringItem categoryItem = new RecurringTransactions.RecurringItem(categoryName, totalAmount);
-
-            // Pulls transactions in the category
-            ArrayList<DailyTransactions.DailyItem> subItems = new ArrayList<>();
-            int numOfSubItems = prefs.getInt("Recurring_Exps_" + k, 0);
-
-            for (int m=0; m<numOfSubItems; m++) {
-                String subItemName = prefs.getString("sub_name_" + k + "_" + m, null);
-                double subItemAmount = Double.longBitsToDouble(prefs.getLong("sub_amount_" + k + "_" + m, 0));
-                DailyTransactions.DailyItem subItem = new DailyTransactions.DailyItem(subItemName, subItemAmount);
-                subItems.add(subItem);
-            }
-            // Add the array list of transactions to the recurring item
-            categoryItem.dailyItems = subItems;
-
-            // Add the recurring item to the array list of recurring items
-            recurringExps.add(categoryItem);
-        }
-
-        return recurringExps;
-    }
 
     public static class SaveUtility {
 
         public RecurringTransactions recurringTraxs;
+        public DailyTransactions dailyTraxs;
+        public SharedPreferences prefs;
 
-        public SaveUtility() {
+
+        public SaveUtility(Context context) {
+            dailyTraxs = new DailyTransactions();
             recurringTraxs = new RecurringTransactions();
+            prefs = PreferenceManager.getDefaultSharedPreferences(context);
         }
 
-        public static void saveNewTransaction() {
+        public ArrayList<DailyTransactions.DailyItem> getDaily() {
+            int size = prefs.getInt("Daily_Exps", 0);
+            ArrayList<DailyTransactions.DailyItem> dailyExps = new ArrayList<>();
+
+            for (int k=0; k<size; k++) {
+                String itemName = prefs.getString("daily_" + k, null);
+                double itemAmount = Double.longBitsToDouble(prefs.getLong("daily_amount_" + k, 0));
+
+                DailyTransactions.DailyItem newItem = new DailyTransactions.DailyItem(itemName, itemAmount);
+                dailyExps.add(newItem);
+            }
+            return dailyExps;
+        }
+
+        public void saveDaily() {
+            List<DailyTransactions.DailyItem> items = dailyTraxs.dailyItems;
+
+            SharedPreferences.Editor ped = prefs.edit();
+            ped.putInt("Daily_Exps", items.size());
+            for (int k=0; k < items.size(); k++) {
+                String itemName = items.get(k).name;
+                double itemAmount = items.get(k).amount;
+                ped.putString("daily_" + k, itemName);
+                ped.putLong("daily_amount_" + k, Double.doubleToRawLongBits(itemAmount));
+            }
+            ped.commit();
+        }
+
+        public void changeDaily(int position, double amount, String name) {
+            dailyTraxs.dailyItems.get(position).name = name;
+            dailyTraxs.dailyItems.get(position).amount = amount;
+            dailyTraxs.addToMap(dailyTraxs.dailyItems.get(position));
+            saveDaily();
+        }
+
+        public void addDaily(double amount, String name) {
+            dailyTraxs.createDailyItem(name, amount);
+            saveDaily();
+        }
+
+        public void saveRecurring() {
+            List<RecurringTransactions.RecurringItem> items = recurringTraxs.recurringItems;
+
+            SharedPreferences.Editor ped = prefs.edit();
+            int numOfCategories = items.size();
+            ped.putInt("Recurring_Exps", numOfCategories);
+            for (int k=0; k < numOfCategories; k++) {
+                RecurringTransactions.RecurringItem item = items.get(k);
+                int numOfTransInCategory = item.dailyItems.size();
+
+                String itemName = item.categoryName;
+                double itemAmount = item.totalAmount;
+
+                ped.putString("recur_" + k, itemName);
+                ped.putLong("recur_amount_" + k, Double.doubleToRawLongBits(itemAmount));
+
+                ped.putInt("Recurring_Exps_" + k, numOfTransInCategory);
+
+                for (int m=0; m<numOfTransInCategory; m++) {
+                    DailyTransactions.DailyItem subItem = item.dailyItems.get(m);
+
+                    String subItemName = subItem.name;
+                    double subItemAmount = subItem.amount;
+                    ped.putString("sub_name_" + k + "_" + m, subItemName);
+                    ped.putLong("sub_amount_" + k + "_" + m, Double.doubleToRawLongBits(subItemAmount));
+                }
+            }
+            ped.commit();
+        }
+
+        public ArrayList<RecurringTransactions.RecurringItem> getRecurring() {
+            int size = prefs.getInt("Recurring_Exps", 0);
+            ArrayList<RecurringTransactions.RecurringItem> recurringExps = new ArrayList<>();
+
+            for (int k=0; k<size; k++) {
+                String categoryName = prefs.getString("recur_" + k, null);
+                double totalAmount = Double.longBitsToDouble(prefs.getLong("recur_amount_" + k, 0));
+                RecurringTransactions.RecurringItem categoryItem = new RecurringTransactions.RecurringItem(categoryName, totalAmount);
+
+                // Pulls transactions in the category
+                ArrayList<DailyTransactions.DailyItem> subItems = new ArrayList<>();
+                int numOfSubItems = prefs.getInt("Recurring_Exps_" + k, 0);
+
+                for (int m=0; m<numOfSubItems; m++) {
+                    String subItemName = prefs.getString("sub_name_" + k + "_" + m, null);
+                    double subItemAmount = Double.longBitsToDouble(prefs.getLong("sub_amount_" + k + "_" + m, 0));
+                    DailyTransactions.DailyItem subItem = new DailyTransactions.DailyItem(subItemName, subItemAmount);
+                    subItems.add(subItem);
+                }
+                // Add the array list of transactions to the recurring item
+                categoryItem.dailyItems = subItems;
+
+                // Add the recurring item to the array list of recurring items
+                recurringExps.add(categoryItem);
+            }
+
+            return recurringExps;
+        }
+
+        public void changeRecurring(int position, double amount, String name) {
+            RecurringTransactions.RecurringItem itemToChange = recurringTraxs.recurringItems.get(position);
+            String oldName = itemToChange.categoryName;
+
+            if (oldName != name || Double.compare(itemToChange.totalAmount, amount) != 0) {
+                //change name and amount.
+                itemToChange.categoryName = name;
+                itemToChange.totalAmount = amount;
+                recurringTraxs.recurringItems.set(position, itemToChange);
+
+                //Remove old entry and create new for ITEM_MAP
+                recurringTraxs.ITEM_MAP.remove(oldName);
+                recurringTraxs.ITEM_MAP.put(name, itemToChange);
+
+                saveRecurring();
+            }
+        }
+
+        public void addRecurring(double amount, String name) {
+            recurringTraxs.createRecurringItem(name, amount);
+            saveRecurring();
+        }
+
+        public void addSubItem(int catPosition, double amount, String name) {
+            DailyTransactions.DailyItem itemToAdd = new DailyTransactions.DailyItem(name, amount);
+
+            recurringTraxs.recurringItems.get(catPosition).dailyItems.add(itemToAdd);
+            saveRecurring();
+
+            int size = recurringTraxs.recurringItems.get(catPosition).dailyItems.size();
+            System.out.println("From addSubItem, item added: name: " + recurringTraxs.recurringItems.get(catPosition).dailyItems.get(size-1).name);
+        }
+
+        public void changeSubItem(int catPosition, int itemPosition, double amount, String name) {
+            DailyTransactions.DailyItem itemToChange = recurringTraxs.recurringItems.get(catPosition).dailyItems.get(itemPosition);
+            String oldName = itemToChange.name;
+
+            if (oldName != name || Double.compare(itemToChange.amount, amount) != 0 ) {
+                // change name and amount of sub item
+                itemToChange.name = name;
+                itemToChange.amount = amount;
+                recurringTraxs.recurringItems.get(catPosition).dailyItems.set(itemPosition, itemToChange);
+
+                //Remove old entry and create new for ITEM_MAP ???
+
+                saveRecurring();
+            }
+        }
+
+        public void deleteSubItem(int position, int subPosition) {
+            recurringTraxs.recurringItems.get(position).dailyItems.remove(subPosition);
+            saveRecurring();
+        }
+
+        public void deleteDaily(int position) {
+            dailyTraxs.dailyItems.remove(position);
+            saveDaily();
+        }
+
+        public void deleteRecurring(int position) {
 
         }
     }

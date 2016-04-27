@@ -28,7 +28,7 @@ public class RecurringTransactions {
     static {
         // Add some sample items.
         for (int i = 1; i <= COUNT; i++) {
-            createRecurringItem("Test recurring.", 0.0);
+            createRecurringItem("Test recurring", 0.0);
         }
     }
 
@@ -72,7 +72,7 @@ public class RecurringTransactions {
             this.totalAmount = amount;
 
             for (int k = 0; k<3; k++) {
-                dailyItems.add(new DailyTransactions.DailyItem("Test recurring items", 0.0));
+                dailyItems.add(new DailyTransactions.DailyItem("Test sub items", 0.0));
             }
 
             for (DailyTransactions.DailyItem item : dailyItems) {
