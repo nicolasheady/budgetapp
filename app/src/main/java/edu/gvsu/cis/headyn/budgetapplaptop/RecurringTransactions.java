@@ -23,12 +23,12 @@ public class RecurringTransactions {
      */
     public static final Map<String, RecurringItem> ITEM_MAP = new HashMap<String, RecurringItem>();
 
-    private static final int COUNT = 5;
+    private static final int COUNT = 3;
 
     static {
         // Add some sample items.
-        for (int i = 1; i <= COUNT; i++) {
-            createRecurringItem("Test recurring", 0.0);
+        for (int i = 0; i < COUNT; i++) {
+            createRecurringItem("Test category", 100.0);
         }
     }
 
@@ -56,6 +56,14 @@ public class RecurringTransactions {
             builder.append("\nMore details information here.");
         }
         return builder.toString();
+    }
+
+    public double getTotal() {
+        int sum = 0;
+        for (RecurringItem item: recurringItems) {
+            sum += item.totalAmount;
+        }
+        return sum;
     }
 
     /**

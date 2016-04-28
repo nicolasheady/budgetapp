@@ -23,12 +23,12 @@ public class DailyTransactions {
      */
     public static final Map<String, DailyItem> ITEM_MAP = new HashMap<String, DailyItem>();
 
-    private static final int COUNT = 5;
+    private static final int COUNT = 3;
 
     static {
         // Add some sample items.
         for (int i = 0; i < COUNT; i++) {
-            createDailyItem("Test daily.", 0.0);
+            createDailyItem("Test daily expense", 5.0);
         }
     }
 
@@ -54,6 +54,14 @@ public class DailyTransactions {
             builder.append("\nMore details information here.");
         }
         return builder.toString();
+    }
+
+    public double getTotal() {
+        int sum = 0;
+        for (DailyItem item: dailyItems) {
+            sum += item.amount;
+        }
+        return sum;
     }
 
     /**

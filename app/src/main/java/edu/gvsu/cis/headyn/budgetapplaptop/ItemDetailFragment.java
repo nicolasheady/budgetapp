@@ -24,6 +24,7 @@ public class ItemDetailFragment extends Fragment {
     EditText item_detail;
     EditText item_amount;
     int position;
+    public boolean isEditing;
 
     /**
      * The fragment argument representing the item ID that this fragment
@@ -47,6 +48,7 @@ public class ItemDetailFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        isEditing = true;
         position = getArguments().getInt("ListPosition", 0);
 
         System.out.println("ITEM DETAIL FRAGMENT ListPosition added: " + position);
@@ -88,16 +90,12 @@ public class ItemDetailFragment extends Fragment {
     public void onPause() {
         super.onPause();
 
-        String catName = item_detail.getText().toString();
-        double catAmount = Double.parseDouble(item_amount.getText().toString());
+        if (isEditing) {
+            String catName = item_detail.getText().toString();
+            double catAmount = Double.parseDouble(item_amount.getText().toString());
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        SharedPreferences.Editor ped = prefs.edit();
-
-        ped.putInt("Recur_Edit_Position", position);
-        ped.putString("Recur_Edit_Name", catName);
-        long amount = Double.doubleToLongBits(catAmount);
-        ped.putLong("Recur_Edit_Amount", amount);
-        ped.commit();
+            MainActivity.SaveUtility saver = new MainActivity.SaveUtility(getContext());
+            saver.changeRecurring(position, catAmount, catName);
+        }
     }
 }

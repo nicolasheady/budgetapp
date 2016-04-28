@@ -33,6 +33,7 @@ public class AddItemActivity extends AppCompatActivity implements View.OnClickLi
     private EditText amount;
     private Button setButton;
     private Button deleteButton;
+    private Button addToMap;
     private int position;
     private int subItemPosition;
     private String previousAct;
@@ -60,9 +61,12 @@ public class AddItemActivity extends AppCompatActivity implements View.OnClickLi
         this.amount = (EditText) findViewById(R.id.amount);
         this.setButton = (Button) findViewById(R.id.addButton);
         this.deleteButton = (Button) findViewById(R.id.deleteButton);
+        this.addToMap = (Button) findViewById(R.id.mapButton);
         this.deleteButton.setVisibility(View.GONE);
+        this.addToMap.setVisibility(View.GONE);
         this.deleteButton.setOnClickListener(this);
         this.setButton.setOnClickListener(this);
+        this.addToMap.setOnClickListener(this);
 
         Intent previous = getIntent();
         if (previous.getExtras().containsKey("Previous Activity")) {
@@ -77,6 +81,7 @@ public class AddItemActivity extends AppCompatActivity implements View.OnClickLi
             this.amount.setText(previous.getStringExtra("Amount"));
             this.setButton.setText("Save");
             this.deleteButton.setVisibility(View.VISIBLE);
+            this.addToMap.setVisibility(View.VISIBLE);
         }
         if (previous.getExtras().containsKey("RecurPosition")) {
             this.position = previous.getIntExtra("RecurPosition", 0);
@@ -124,9 +129,12 @@ public class AddItemActivity extends AppCompatActivity implements View.OnClickLi
             } else if (previousAct.equals("RecurringTransFragment")) {
                 saver.deleteSubItem(position, subItemPosition);
             }
-        }
-        System.out.println("PPPPPPPPreviousAct : " + this.previousAct);
 
+        } else if (v == this.addToMap) {
+            Intent intent = new Intent(this, MapsActivity.class);
+            intent.putExtra("AddMarker", name);
+            startActivity(intent);
+        }
         finish();
     }
 }

@@ -1,49 +1,42 @@
 {
   "project_info": {
-    "project_id": "simple-budget-ee3aa",
-    "project_number": "906159610943",
-    "name": "Simple Budget"
+    "project_number": "113614559625",
+    "project_id": "simple-budget-8efa1"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:906159610943:android:4e48fa1d82878ce7",
-        "client_id": "android:edu.gvsu.cis.headyn.budgetapplaptop",
-        "client_type": 1,
+        "mobilesdk_app_id": "1:113614559625:android:4e48fa1d82878ce7",
         "android_client_info": {
-          "package_name": "edu.gvsu.cis.headyn.budgetapplaptop",
-          "certificate_hash": []
+          "package_name": "edu.gvsu.cis.headyn.budgetapplaptop"
         }
       },
       "oauth_client": [
         {
-          "client_id": "906159610943-0nt4k72a4ofd5ee8rp9oq8ggktvhkr6f.apps.googleusercontent.com",
+          "client_id": "113614559625-l5tte2k2086sse789o3pbhu3b4dqb32r.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "edu.gvsu.cis.headyn.budgetapplaptop",
-            "certificate_hash": "55AEB1BEF84FC8B36F483EC4CF70764FDC2FFEFB"
+            "certificate_hash": "E79A6B8323ADF32ED0652AAA6CEBA13EC0BA4B51"
           }
         },
         {
-          "client_id": "906159610943-fi4iscubf7fe1305dvsq5cc0apd9kmmc.apps.googleusercontent.com",
+          "client_id": "113614559625-v77k2se4qlfkeruq0ccqqhbvvksvac60.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
-      "api_key": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGnLMOaEpo-MkrDWtQgdBzNc__QSp2yTw"
+        }
+      ],
       "services": {
         "analytics_service": {
           "status": 1
         },
-        "cloud_messaging_service": {
-          "status": 1,
-          "apns_config": []
-        },
         "appinvite_service": {
           "status": 1,
           "other_platform_oauth_client": []
-        },
-        "google_signin_service": {
-          "status": 2
         },
         "ads_service": {
           "status": 1
@@ -51,6 +44,5 @@
       }
     }
   ],
-  "client_info": [],
-  "ARTIFACT_VERSION": "1"
+  "configuration_version": "1"
 }

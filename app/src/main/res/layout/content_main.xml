@@ -12,4 +12,14 @@
     tools:context="edu.gvsu.cis.headyn.budgetapplaptop.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Total"
+        android:id="@+id/totalBox"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="120dp"
+        android:textSize="20dp" />
 </RelativeLayout>

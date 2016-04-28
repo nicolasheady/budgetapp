@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.app.Fragment;
 import android.util.Log;
 import android.view.View;
@@ -20,15 +19,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +40,8 @@ public class MainActivity extends AppCompatActivity
 
     String currentFragment;
     SaveUtility saver;
+    TextView totalBox;
+    FloatingActionButton fab;
 
 
     @Override
@@ -53,8 +54,9 @@ public class MainActivity extends AppCompatActivity
 
         saver = new SaveUtility(this);
         currentFragment = "Daily";
+        totalBox = (TextView) findViewById(R.id.totalBox);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -103,6 +105,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
 
+        // Don't Need
         System.out.println("::::PRINTING ALL MAP ENTRIES::::");
 
         Map<String, RecurringTransactions.RecurringItem> map = saver.recurringTraxs.ITEM_MAP;
@@ -111,6 +114,7 @@ public class MainActivity extends AppCompatActivity
             // String value = entry.getValue();
             System.out.println(key);
         }
+        ////
 
         if (currentFragment.equals("Daily")) {
             Fragment fragment = new DailyFragment();
@@ -124,30 +128,9 @@ public class MainActivity extends AppCompatActivity
                     .replace(R.id.content_frame, fragment).commit();
         }
 
-
-        // If user was editing a category, we save it
-        if (saver.prefs.contains("Recur_Edit_Position")) {
-
-            int position = saver.prefs.getInt("Recur_Edit_Position", 0);
-            String catName = saver.prefs.getString("Recur_Edit_Name", "Category");
-            double catAmount = Double.longBitsToDouble(saver.prefs.getLong("Recur_Edit_Amount", 0));
-
-            System.out.println("Name : " + catName);
-            System.out.println("Amount : " + catAmount);
-            System.out.println("List Position : " + position);
-
-            saver.changeRecurring(position, catAmount, catName);
-        }
-
-        // Removes these "temp" saved items so they don't appear when they don't need to
-        SharedPreferences.Editor ped = saver.prefs.edit();
-        ped.remove("Recur_Edit_Position");
-        ped.remove("Recur_Edit_Name");
-        ped.remove("Recur_Edit_Amount");
-        ped.commit();
-
         super.onResume();
 
+        refreshTotals();
     }
 
     @Override
@@ -185,6 +168,9 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+
+        totalBox.setVisibility(View.GONE);
+
         // Handle navigation view item clicks here.
         Fragment fragment = null;
         int id = item.getItemId();
@@ -192,15 +178,19 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.daily) {
             currentFragment = "Daily";
             fragment = new DailyFragment();
+
         } else if (id == R.id.recurring) {
             currentFragment = "Recurring";
             fragment = new RecurringFragment();
+
+        } else if (id == R.id.map) {
+            currentFragment = "Map";
+            Intent intent = new Intent (this, MapsActivity.class);
+            startActivity(intent);
+
         } else if (id == R.id.settings) {
+            currentFragment = "Settings";
             fragment = new SettingsFragment();
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
         }
 
         if (fragment != null) {
@@ -221,7 +211,28 @@ public class MainActivity extends AppCompatActivity
             Log.e("MainActivity", "Error in creating fragment");
         }
 
+        refreshTotals();
+
         return true;
+    }
+
+    private void refreshTotals() {
+
+        fab.setVisibility(View.VISIBLE);
+        totalBox.setVisibility(View.VISIBLE);
+
+        if (currentFragment.equals("Daily")) {
+            double total = saver.getDailyTotal();
+            totalBox.setText("$" + Double.toString(total));
+
+        } else if (currentFragment.equals("Recurring")) {
+            double total = saver.getRecurringTotal();
+            totalBox.setText("$" + Double.toString(total));
+
+        } else if (currentFragment.equals("Settings")) {
+            fab.setVisibility(View.GONE);
+            totalBox.setVisibility(View.GONE);
+        }
     }
 
     private void launchAddItem() {
@@ -240,12 +251,21 @@ public class MainActivity extends AppCompatActivity
         public RecurringTransactions recurringTraxs;
         public DailyTransactions dailyTraxs;
         public SharedPreferences prefs;
-
+        Context context;
 
         public SaveUtility(Context context) {
             dailyTraxs = new DailyTransactions();
             recurringTraxs = new RecurringTransactions();
             prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            this.context = context;
+        }
+
+        public double getDailyTotal() {
+            return dailyTraxs.getTotal();
+        }
+
+        public double getRecurringTotal() {
+            return recurringTraxs.getTotal();
         }
 
         public ArrayList<DailyTransactions.DailyItem> getDaily() {
@@ -274,6 +294,7 @@ public class MainActivity extends AppCompatActivity
                 ped.putLong("daily_amount_" + k, Double.doubleToRawLongBits(itemAmount));
             }
             ped.commit();
+
         }
 
         public void changeDaily(int position, double amount, String name) {
@@ -363,6 +384,15 @@ public class MainActivity extends AppCompatActivity
 
                 saveRecurring();
             }
+
+            if (prefs.contains("Recur_Edit_Position")) {
+                // Removes these "temp" saved items so they don't appear when they don't need to
+                SharedPreferences.Editor ped = prefs.edit();
+                ped.remove("Recur_Edit_Position");
+                ped.remove("Recur_Edit_Name");
+                ped.remove("Recur_Edit_Amount");
+                ped.commit();
+            }
         }
 
         public void addRecurring(double amount, String name) {
@@ -407,7 +437,56 @@ public class MainActivity extends AppCompatActivity
         }
 
         public void deleteRecurring(int position) {
+            recurringTraxs.recurringItems.remove(position);
+            saveRecurring();
+        }
 
+        public void saveMarkers(ArrayList<MyMarker> items) {
+
+            SharedPreferences.Editor ped = prefs.edit();
+
+            ped.putInt("Markers", items.size());
+            for (int k=0; k < items.size(); k++) {
+                String itemName = items.get(k).name;
+                LatLng pos = items.get(k).pos;
+                double lat = pos.latitude;
+                double lon = pos.longitude;
+                ped.putString("marker_" + k, itemName);
+                ped.putLong("marker_lat_" + k, Double.doubleToRawLongBits(lat));
+                ped.putLong("marker_lon_" + k, Double.doubleToRawLongBits(lon));
+            }
+            ped.commit();
+        }
+
+        public ArrayList<MyMarker> getMarkers() {
+
+            if (!prefs.contains("Markers")) {
+                return null;
+            }
+
+            int size = prefs.getInt("Markers", 0);
+            ArrayList<MyMarker> markers = new ArrayList<>();
+
+            for (int k=0; k<size; k++) {
+                String itemName = prefs.getString("marker_" + k, null);
+                double lat = Double.longBitsToDouble(prefs.getLong("marker_lat_" + k, 0));
+                double lon = Double.longBitsToDouble(prefs.getLong("marker_lon_" + k, 0));
+
+                LatLng pos = new LatLng(lat, lon);
+                MyMarker marker = new MyMarker(pos, itemName);
+                markers.add(marker);
+            }
+            return markers;
+        }
+
+        public static class MyMarker {
+            LatLng pos;
+            String name;
+
+            public MyMarker(LatLng pos, String name) {
+                this.pos = pos;
+                this.name = name;
+            }
         }
     }
 }

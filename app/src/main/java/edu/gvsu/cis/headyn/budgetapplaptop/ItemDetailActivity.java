@@ -33,7 +33,7 @@ public class ItemDetailActivity extends AppCompatActivity {
     private int listPosition = 0;
     public String catName;
     public double catAmount;
-    MainActivity main;
+    private ItemDetailFragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +41,6 @@ public class ItemDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_item_detail);
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
-
-
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -52,6 +50,14 @@ public class ItemDetailActivity extends AppCompatActivity {
             }
         });
 
+        FloatingActionButton fabDelete = (FloatingActionButton) findViewById(R.id.fabDelete);
+        fabDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Delete Recurring category
+                deleteThisCategory();
+            }
+        });
 
         Intent previous = getIntent();
         this.listPosition = previous.getIntExtra("RecurPosition", 0);
@@ -80,7 +86,7 @@ public class ItemDetailActivity extends AppCompatActivity {
 
             arguments.putString(ItemDetailFragment.ARG_ITEM_ID,
                     getIntent().getStringExtra(ItemDetailFragment.ARG_ITEM_ID));
-            ItemDetailFragment fragment = new ItemDetailFragment();
+            fragment = new ItemDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.item_detail_container, fragment)
@@ -126,7 +132,13 @@ public class ItemDetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void deleteThisCategory() {
+        fragment.isEditing = false;
 
+        MainActivity.SaveUtility saver = new MainActivity.SaveUtility(this);
+        saver.deleteRecurring(listPosition);
+        finish();
+    }
 
     private void launchAddItem() {
         Intent launchAddItem = new Intent(this, AddItemActivity.class);
