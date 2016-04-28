@@ -108,7 +108,7 @@ public class RecurringFragment extends Fragment {
                         Context context = v.getContext();
                         Intent intent = new Intent(context, ItemDetailActivity.class);
                         intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, holder.mItem.categoryName);
-                        intent.putExtra("RecurPosition", listPosition);
+                        intent.putExtra("List Position", listPosition);
 
                         context.startActivity(intent);
                     }

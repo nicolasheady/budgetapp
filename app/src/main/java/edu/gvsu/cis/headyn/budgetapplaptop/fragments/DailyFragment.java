@@ -104,8 +104,8 @@ public class DailyFragment extends Fragment {
                         intent.putExtra("Amount", itemAmount);
                         intent.putExtra("Position", position);
 
-                        //getActivity().startActivityForResult(intent, 0xFACD);
-                        context.startActivity(intent);
+                        getActivity().startActivityForResult(intent, 0xFACD);
+                        //context.startActivity(intent);
                     }
                 }
             });
