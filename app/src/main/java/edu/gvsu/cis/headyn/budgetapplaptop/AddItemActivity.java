@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
@@ -18,7 +19,7 @@ import android.widget.Toast;
     a new line item.
  */
 
-public class AddItemActivity extends ActionBarActivity {
+public class AddItemActivity extends AppCompatActivity implements View.OnClickListener {
 
     OnHeadlineSelectedListener mCallback;
 
@@ -34,6 +35,8 @@ public class AddItemActivity extends ActionBarActivity {
     private Button deleteButton;
     private Button addToMap;
     private int position;
+    private int subItemPosition;
+    private String previousAct;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,121 +61,80 @@ public class AddItemActivity extends ActionBarActivity {
         this.amount = (EditText) findViewById(R.id.amount);
         this.setButton = (Button) findViewById(R.id.addButton);
         this.deleteButton = (Button) findViewById(R.id.deleteButton);
-<<<<<<< HEAD
         this.addToMap = (Button) findViewById(R.id.mapButton);
         this.deleteButton.setVisibility(View.GONE);
         this.addToMap.setVisibility(View.GONE);
         this.deleteButton.setOnClickListener(this);
         this.setButton.setOnClickListener(this);
         this.addToMap.setOnClickListener(this);
-=======
->>>>>>> 1d8792acf755b3d8c1c063bdfdfb04ae54568c0d
 
         Intent previous = getIntent();
+        if (previous.getExtras().containsKey("Previous Activity")) {
+            previousAct = previous.getStringExtra("Previous Activity");
+        } else {
+            previousAct = "None";
+        }
 
-        // If this activity was launch by clicking on a transaction, change titles appropriately:
-        if (!previous.getStringExtra("Previous Activity").equals("AddItem")) {
+        // Change titles and variables appropriately:
+        if (!previousAct.equals("AddDaily") && !previousAct.equals("AddSubItem") && !previousAct.equals("AddRecurring")) {
             this.name.setText(previous.getStringExtra("Name"));
             this.amount.setText(previous.getStringExtra("Amount"));
             this.setButton.setText("Save");
-<<<<<<< HEAD
             this.deleteButton.setVisibility(View.VISIBLE);
             this.addToMap.setVisibility(View.VISIBLE);
         }
         if (previous.getExtras().containsKey("RecurPosition")) {
             this.position = previous.getIntExtra("RecurPosition", 0);
         } else if (previous.getExtras().containsKey("Position")) {
-=======
->>>>>>> 1d8792acf755b3d8c1c063bdfdfb04ae54568c0d
             this.position = previous.getIntExtra("Position", 0);
+        }
+        if (previous.getExtras().containsKey("SubItemPosition")) {
+            this.subItemPosition = previous.getIntExtra("SubItemPosition", 0);
         }
     }
 
     public void onClick(View v) {
 
-        if (v == setButton) {
-            EditText nameView = (EditText) findViewById(R.id.name);
-            EditText amountView = (EditText) findViewById(R.id.amount);
+        EditText nameView = (EditText) findViewById(R.id.name);
+        EditText amountView = (EditText) findViewById(R.id.amount);
 
-            String name = nameView.getText().toString();
-            String amountStr = amountView.getText().toString();
-            double amount = Double.parseDouble(amountStr);
+        String name = nameView.getText().toString();
+        String amountStr = amountView.getText().toString();
+        double amount = Double.parseDouble(amountStr);
 
-            Intent answer = new Intent();
-            answer.putExtra("transName", name);
-            answer.putExtra("amount", amount);
-            answer.putExtra("Position", position);
-            setResult (RESULT_OK, answer); // pass the result to the caller of this activity
+        MainActivity.SaveUtility saver = new MainActivity.SaveUtility(this);
 
-        } else if (v == deleteButton) {
+        if (v == this.setButton) {
 
+            System.out.println("SET BUTTON PRESSED!");
 
-        }
-
-        //What if statement to put this under?
-        MainActivity.SaveUtility saver = new MainActivity.SaveUtility();
-        saver.saveNewTransaction();
-
-
-
-        Context context = getApplicationContext();
-        CharSequence text;
-        int duration = Toast.LENGTH_SHORT;
-        //int allocated = myDb.getTotalAllocated();
-
-        //SharedPreferences preferences = getSharedPreferences(MainActivity.PREFS_NAME, 0);
-        //int curBudget = preferences.getInt("curBudget", 0);
-
-        /*
-        // basic input validation
-        if(amountStr.equals("") || name.equals("")) {
-
-            text = "Invalid input, please try again!";
-            Toast.makeText(context, text, duration).show();
-
-        } else if(!(name.replaceAll("\\s+", "")).matches("[a-zA-z]+")) {
-
-            text = "Item name can only contain letters, please try again!";
-            Toast.makeText(context, text, duration).show();
-
-        } else {
-
-            if(allocated == curBudget) {
-                text = "Current budget has already been completely allocated";
-                Toast.makeText(context, text, duration).show();
-                finish();
-            } else if((allocated + Integer.parseInt(amountStr)) > curBudget) {
-                text = "Amount exceeds remaining allocatable budget, please try again!";
-                Toast.makeText(context, text, duration).show();
-            } else {
-
-                if(myDb.checkNameExists(name)) {
-                    text = "Item with that name already exists, please try again!";
-                    Toast.makeText(context, text, duration).show();
-                } else {
-                    myDb.insertLineItem(name, Integer.parseInt(amountStr), 0);
-
-                    text = "Item added. $" + Integer.toString(curBudget - myDb.getTotalAllocated()) + ".00 remaining to be allocated.";
-                    duration = Toast.LENGTH_LONG;
-                    Toast.makeText(context, text, duration).show();
-                    finish();
-                }
-
+            if (previousAct.equals("DailyFragment")) {
+                saver.changeDaily(position, amount, name);
+            } else if (previousAct.equals("AddDaily")) {
+                saver.addDaily(amount, name);
+            } else if (previousAct.equals("AddRecurring")) {
+                saver.addRecurring(amount, name);
+            }  else if (previousAct.equals("RecurringTransFragment")) {
+                saver.changeSubItem(this.position, this.subItemPosition, amount, name);
+            } else if (previousAct.equals("AddSubItem")) {
+                saver.addSubItem(this.position, amount, name);
             }
-<<<<<<< HEAD
+
+        } else if (v == this.deleteButton) {
+
+            System.out.println("DELETE BUTTON PRESSED!");
+
+            if (previousAct.equals("DailyFragment")) {
+                saver.deleteDaily(position);
+            } else if (previousAct.equals("RecurringTransFragment")) {
+                saver.deleteSubItem(position, subItemPosition);
+            }
 
         } else if (v == this.addToMap) {
             Intent intent = new Intent(this, MapsActivity.class);
             intent.putExtra("AddMarker", name);
             startActivity(intent);
         }
-=======
-
-        }
-
-        */
->>>>>>> 1d8792acf755b3d8c1c063bdfdfb04ae54568c0d
         finish();
     }
-
 }
