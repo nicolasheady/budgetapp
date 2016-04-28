@@ -9,7 +9,6 @@ import java.util.Map;
  * Helper class for providing sample content for user interfaces created by
  * Android template wizards.
  * <p/>
- * TODO: Replace all uses of this class before publishing your app.
  */
 public class RecurringTransactions {
 
@@ -27,13 +26,8 @@ public class RecurringTransactions {
 
     static {
         // Add some sample items.
-<<<<<<< HEAD
         for (int i = 0; i < COUNT; i++) {
             createRecurringItem("Test category", 100.0);
-=======
-        for (int i = 1; i <= COUNT; i++) {
-            createRecurringItem("Test recurring.", 0.0);
->>>>>>> 1d8792acf755b3d8c1c063bdfdfb04ae54568c0d
         }
     }
 

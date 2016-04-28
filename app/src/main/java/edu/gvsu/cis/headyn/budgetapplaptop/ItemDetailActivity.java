@@ -125,7 +125,6 @@ public class ItemDetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-<<<<<<< HEAD
     private void deleteThisCategory() {
         fragment.isEditing = false;
 
@@ -141,8 +140,6 @@ public class ItemDetailActivity extends AppCompatActivity {
         startActivityForResult(launchAddItem, 0xFACE);
     }
 
-=======
->>>>>>> 1d8792acf755b3d8c1c063bdfdfb04ae54568c0d
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(RecurringTransactions.recurringItems.get(this.listPosition).dailyItems));
     }
